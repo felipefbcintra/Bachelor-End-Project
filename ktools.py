@@ -153,3 +153,32 @@ def total_accuracy(gcl, lcl):
         pred = pd.Series(lcl) # to use series.map
         pred = pred.map(index_dict)
         return  sk.metrics.f1_score(pd.Series(np.array(gcl)), pred, average="macro")
+    
+
+
+# matrix to numpy
+def to_np(G:nx.multidigraph):
+    edges = list(G.edges())#gets edges from generated network
+    l = []
+    [(l.append(x[0]), l.append(x[1])) for x in edges] #shape of matrix 
+    m = max(l) +1
+    A = np.zeros([m,m])
+
+    for e in edges:
+        A[e[0], e[1]] = 1
+
+
+    return A
+
+
+# Inducing flow
+def flow_ij(G,i,j):
+    return nx.flow.maximum_flow(G, i, j)[0]
+
+def create_id(A):
+    G = nx.from_numpy_array(A, parallel_edges=True,create_using=nx.DiGraph, edge_attr="capacity")
+    m = A.shape[0]
+    ind_i = ind_j = np.arange(0,m)
+    Id = np.zeros([m,m])
+
+    return Id
