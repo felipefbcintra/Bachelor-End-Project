@@ -8,7 +8,7 @@ import sklearn as sk
 from sklearn.metrics import accuracy_score, balanced_accuracy_score
 from munkres import Munkres
 import pandas as pd
-
+import tqdm as tqdm
 
 
 def tranlsate_communities(cm:list[set]):
@@ -175,10 +175,16 @@ def to_np(G:nx.multidigraph):
 def flow_ij(G,i,j):
     return nx.flow.maximum_flow(G, i, j)[0]
 
-def create_id(A):
-    G = nx.from_numpy_array(A, parallel_edges=True,create_using=nx.DiGraph, edge_attr="capacity")
-    m = A.shape[0]
-    ind_i = ind_j = np.arange(0,m)
-    Id = np.zeros([m,m])
 
-    return Id
+def flow_id_from_graph(G):
+    A = to_np(G)
+    D = nx.from_numpy_array(A, parallel_edges=True,create_using=nx.DiGraph, edge_attr="capacity")
+    I = np.zeros((A.shape[0], A.shape[0]))
+
+    for i in tqdm.tqdm(range(A.shape[0])):
+        for j in range(A.shape[0]):
+            if i != j:
+                I[i,j] = flow_ij(D, i,j)
+            else:
+                I[i,j] = 0
+    return I
