@@ -176,7 +176,7 @@ def flow_ij(G,i,j):
     return nx.flow.maximum_flow(G, i, j)[0]
 
 def flow_ij_large(G,i,j):
-    return nx.flow.edmonds_karp(G, i, j)[0]
+    return nx.flow.maximum_flow(G, i, j, flow_func=nx.algorithms.flow.minimum_cut)[0]
 
 
 def flow_id_from_graph(G):
@@ -192,6 +192,19 @@ def flow_id_from_graph(G):
                 I[i,j] = 0
     return I
 
+
+def flow_id_from_graph_l(G):
+    A = to_np(G)
+    D = nx.from_numpy_array(A, parallel_edges=True,create_using=nx.DiGraph, edge_attr="capacity")
+    I = np.zeros((A.shape[0], A.shape[0]))
+
+    for i in tqdm.tqdm(range(A.shape[0])):
+        for j in range(A.shape[0]):
+            if i != j:
+                I[i,j] = flow_ij_large(D, i,j)
+            else:
+                I[i,j] = 0
+    return I
 
 
 
